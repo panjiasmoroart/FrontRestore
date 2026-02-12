@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Product } from "../models/product";
 import Catalog from "../../features/catalog/Catalog";
+import { Container, Typography } from "@mui/material";
 
 // const arrProducts = [
 //   { name: "Product 1", price: 100 },
@@ -35,10 +36,10 @@ function App() {
   };
 
   return (
-    <div>
-      <h1 style={{ color: "red" }}>React Restore</h1>
+    <Container maxWidth="xl">
+      <Typography variant="h4">.NET React</Typography>
       <Catalog products={products} addProduct={addProduct} />
-    </div>
+    </Container>
   );
 }
 
