@@ -38,8 +38,10 @@ function App() {
       <Box
         sx={{
           minHeight: "100vh",
-          background: darkMode ? "#121212" : "#eaeaea",
-          // py: 6,
+          background: darkMode
+            ? "radial-gradient(circle, #1e3aBa, #111B27)"
+            : "radial-gradient(circle, #baecf9, #f0f9ff)",
+          py: 6,
         }}
       >
         <Container maxWidth="xl" sx={{ mt: 14 }}>
