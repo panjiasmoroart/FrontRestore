@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Product } from "../models/product";
+import Catalog from "../../features/catalog/Catalog";
 
 // const arrProducts = [
 //   { name: "Product 1", price: 100 },
@@ -35,15 +36,8 @@ function App() {
 
   return (
     <div>
-      <h1>Front Restore</h1>
-      <ul>
-        {products.map((product, index) => (
-          <li key={index}>
-            {product.name} - ${product.price}
-          </li>
-        ))}
-      </ul>
-      <button onClick={addProduct}>Add Product</button>
+      <h1 style={{ color: "red" }}>React Restore</h1>
+      <Catalog products={products} addProduct={addProduct} />
     </div>
   );
 }
