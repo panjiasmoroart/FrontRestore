@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import type { Product } from "../models/product";
 import Catalog from "../../features/catalog/Catalog";
-import { Container } from "@mui/material";
+import { Box, Container, CssBaseline } from "@mui/material";
 import NavBar from "./NavBar";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 // const arrProducts = [
 //   { name: "Product 1", price: 100 },
@@ -12,6 +13,17 @@ import NavBar from "./NavBar";
 function App() {
   // const [products, setProducts] = useState(arrProducts);
   const [products, setProducts] = useState<Product[]>([]);
+  const darkMode = false;
+  const paletteType = darkMode ? "dark" : "light";
+
+  const theme = createTheme({
+    palette: {
+      mode: paletteType,
+      background: {
+        default: paletteType === "light" ? "#eaeaea" : "#121212",
+      },
+    },
+  });
 
   useEffect(() => {
     fetch("https://localhost:5001/api/products")
@@ -20,12 +32,21 @@ function App() {
   }, []);
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
       <NavBar />
-      <Container maxWidth="xl" sx={{ mt: 14 }}>
-        <Catalog products={products} />
-      </Container>
-    </>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          background: darkMode ? "#121212" : "#eaeaea",
+          // py: 6,
+        }}
+      >
+        <Container maxWidth="xl" sx={{ mt: 14 }}>
+          <Catalog products={products} />
+        </Container>
+      </Box>
+    </ThemeProvider>
   );
 }
 
