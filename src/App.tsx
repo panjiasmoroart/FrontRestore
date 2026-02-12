@@ -1,10 +1,24 @@
-const products = [
-  { name: "Product 1", price: 10 },
-  { name: "Product 2", price: 20 },
-  { name: "Product 3", price: 30 },
+import { useState } from "react";
+
+const arrProducts = [
+  { name: "Product 1", price: 100 },
+  { name: "Product 2", price: 200 },
 ];
 
 function App() {
+  const [products, setProducts] = useState(arrProducts);
+
+  const addProduct = () => {
+    // setProducts([...products, { name: "Product 4", price: 40 }]);
+    setProducts((prevState) => [
+      ...prevState,
+      {
+        name: "Product " + (prevState.length + 1),
+        price: (prevState.length + 1) * 100,
+      },
+    ]);
+  };
+
   return (
     <div>
       <h1>Front Restore</h1>
@@ -15,6 +29,7 @@ function App() {
           </li>
         ))}
       </ul>
+      <button onClick={addProduct}>Add Product</button>
     </div>
   );
 }
