@@ -1,12 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const arrProducts = [
-  { name: "Product 1", price: 100 },
-  { name: "Product 2", price: 200 },
-];
+// const arrProducts = [
+//   { name: "Product 1", price: 100 },
+//   { name: "Product 2", price: 200 },
+// ];
 
 function App() {
-  const [products, setProducts] = useState(arrProducts);
+  // const [products, setProducts] = useState(arrProducts);
+  const [products, setProducts] = useState<{ name: string; price: number }[]>(
+    [],
+  );
+
+  useEffect(() => {
+    fetch("https://localhost:5001/api/products")
+      .then((response) => response.json())
+      .then((data) => setProducts(data));
+  }, []);
 
   const addProduct = () => {
     // setProducts([...products, { name: "Product 4", price: 40 }]);
