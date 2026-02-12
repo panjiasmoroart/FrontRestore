@@ -13,9 +13,8 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 function App() {
   // const [products, setProducts] = useState(arrProducts);
   const [products, setProducts] = useState<Product[]>([]);
-  const darkMode = false;
+  const [darkMode, setDarkMode] = useState(false);
   const paletteType = darkMode ? "dark" : "light";
-
   const theme = createTheme({
     palette: {
       mode: paletteType,
@@ -24,6 +23,10 @@ function App() {
       },
     },
   });
+
+  const toogleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
   useEffect(() => {
     fetch("https://localhost:5001/api/products")
@@ -34,7 +37,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <NavBar />
+      <NavBar toogleDarkMode={toogleDarkMode} darkMode={darkMode} />
       <Box
         sx={{
           minHeight: "100vh",
