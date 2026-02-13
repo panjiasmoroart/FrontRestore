@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
-import type { Product } from "../models/product";
-import Catalog from "../../features/catalog/Catalog";
 import { Box, Container, CssBaseline } from "@mui/material";
 import NavBar from "./NavBar";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
 
 // const arrProducts = [
 //   { name: "Product 1", price: 100 },
@@ -12,7 +11,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 function App() {
   // const [products, setProducts] = useState(arrProducts);
-  const [products, setProducts] = useState<Product[]>([]);
+
   const [darkMode, setDarkMode] = useState(false);
   const paletteType = darkMode ? "dark" : "light";
   const theme = createTheme({
@@ -28,12 +27,6 @@ function App() {
     setDarkMode(!darkMode);
   };
 
-  useEffect(() => {
-    fetch("https://localhost:5001/api/products")
-      .then((response) => response.json())
-      .then((data) => setProducts(data));
-  }, []);
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -47,8 +40,10 @@ function App() {
           py: 6,
         }}
       >
-        <Container maxWidth="xl" sx={{ mt: 14 }}>
-          <Catalog products={products} />
+        <Container maxWidth="xl" sx={{ mt: 8 }}>
+          {/* <Catalog /> */}
+          {/* dynaminc content */}
+          <Outlet />
         </Container>
       </Box>
     </ThemeProvider>
