@@ -11,7 +11,8 @@ import {
   Typography,
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
-import { useAppSelector } from "../store/store";
+import { useAppDispatch, useAppSelector } from "../store/store";
+import { setDarkMode } from "./uiSlice";
 
 const midLinks = [
   { title: "catalog", path: "/catalog" },
@@ -24,10 +25,10 @@ const rightLinks = [
   { title: "register", path: "/register" },
 ];
 
-type Props = {
-  toogleDarkMode: () => void;
-  darkMode: boolean;
-};
+// type Props = {
+//   toogleDarkMode: () => void;
+//   darkMode: boolean;
+// };
 
 const navStyles = {
   color: "inherit",
@@ -41,8 +42,10 @@ const navStyles = {
   },
 };
 
-export default function NavBar({ toogleDarkMode, darkMode }: Props) {
-  const { isLoading } = useAppSelector((state) => state.ui);
+// export default function NavBar({ toogleDarkMode, darkMode }: Props) {
+export default function NavBar() {
+  const { isLoading, darkMode } = useAppSelector((state) => state.ui);
+  const dispatch = useAppDispatch();
 
   return (
     <AppBar position="fixed">
@@ -57,7 +60,7 @@ export default function NavBar({ toogleDarkMode, darkMode }: Props) {
           <Typography variant="h6" component={NavLink} sx={navStyles} to="/">
             .NET React
           </Typography>
-          <IconButton onClick={toogleDarkMode}>
+          <IconButton onClick={() => dispatch(setDarkMode())}>
             {darkMode ? <DarkMode /> : <LightMode sx={{ color: "yellow" }} />}
           </IconButton>
         </Box>
