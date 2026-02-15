@@ -9,10 +9,15 @@ import { Outlet } from "react-router-dom";
 //   { name: "Product 2", price: 200 },
 // ];
 
+const getInitialDarkMode = () => {
+  const storedDarkMode = localStorage.getItem("darkMode");
+  return storedDarkMode ? JSON.parse(storedDarkMode) : true;
+};
+
 function App() {
   // const [products, setProducts] = useState(arrProducts);
 
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(getInitialDarkMode);
   const paletteType = darkMode ? "dark" : "light";
   const theme = createTheme({
     palette: {
@@ -24,6 +29,7 @@ function App() {
   });
 
   const toogleDarkMode = () => {
+    localStorage.setItem("darkMode", JSON.stringify(!darkMode));
     setDarkMode(!darkMode);
   };
 
