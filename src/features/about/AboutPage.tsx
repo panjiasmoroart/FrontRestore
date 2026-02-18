@@ -1,4 +1,13 @@
-import { Container, Typography, ButtonGroup, Button } from "@mui/material";
+import {
+  Container,
+  Typography,
+  ButtonGroup,
+  Button,
+  Alert,
+  AlertTitle,
+  List,
+  ListItem,
+} from "@mui/material";
 import {
   useLazyGet400ErrorQuery,
   useLazyGet401ErrorQuery,
@@ -6,13 +15,32 @@ import {
   useLazyGet500ErrorQuery,
   useLazyGetValidationErrorQuery,
 } from "./errorApi";
+import { useState } from "react";
 
 export default function AboutPage() {
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+
   const [trigger400Error] = useLazyGet400ErrorQuery();
   const [trigger401Error] = useLazyGet401ErrorQuery();
   const [trigger404Error] = useLazyGet404ErrorQuery();
   const [trigger500Error] = useLazyGet500ErrorQuery();
   const [triggerValidationError] = useLazyGetValidationErrorQuery();
+
+  const getValidatonError = async () => {
+    try {
+      await triggerValidationError().unwrap();
+    } catch (error: unknown) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "message" in error &&
+        typeof (error as { message: unknown }).message === "string"
+      ) {
+        const errorArray = (error as { message: string }).message.split(", ");
+        setValidationErrors(errorArray);
+      }
+    }
+  };
 
   return (
     <Container maxWidth="lg">
@@ -46,13 +74,26 @@ export default function AboutPage() {
         </Button>
         <Button
           variant="contained"
-          onClick={() =>
-            triggerValidationError().catch((err) => console.log(err))
-          }
+          onClick={getValidatonError}
+          // onClick={() =>
+          //   triggerValidationError()
+          //     .unwrap()
+          //     .catch((err) => console.log(err))
+          // }
         >
           Test Validation Error
         </Button>
       </ButtonGroup>
+      {validationErrors.length > 0 && (
+        <Alert severity="error">
+          <AlertTitle>Validation errors</AlertTitle>
+          <List>
+            {validationErrors.map((err) => (
+              <ListItem key={err}>{err}</ListItem>
+            ))}
+          </List>
+        </Alert>
+      )}
     </Container>
   );
 }
