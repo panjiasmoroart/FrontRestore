@@ -55,6 +55,7 @@ export default function BasketItem({ item }: Props) {
           <Grid container spacing={1} alignItems="center">
             <IconButton
               onClick={() =>
+                item.productId &&
                 removeBasketItem({ productId: item.productId, quantity: 1 })
               }
               color="error"
@@ -65,9 +66,7 @@ export default function BasketItem({ item }: Props) {
             </IconButton>
             <Typography variant="h6">{item.quantity}</Typography>
             <IconButton
-              onClick={() =>
-                addBasketItem({ productId: item.productId, quantity: 1 })
-              }
+              onClick={() => addBasketItem({ product: item, quantity: 1 })}
               color="success"
               size="small"
               sx={{ border: 1, borderRadius: 1, minWidth: 0 }}
@@ -79,6 +78,7 @@ export default function BasketItem({ item }: Props) {
       </Box>
       <IconButton
         onClick={() =>
+          item.productId &&
           removeBasketItem({
             productId: item.productId,
             quantity: item.quantity,
