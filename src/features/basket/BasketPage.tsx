@@ -1,6 +1,7 @@
 import { Typography, Grid } from "@mui/material";
 import { useFetchBasketQuery } from "./basketApi";
 import BasketItem from "./BasketItem";
+import OrderSummary from "../../app/shared/components/OrderSummary";
 
 export default function BasketPage() {
   const { data, isLoading } = useFetchBasketQuery();
@@ -17,7 +18,9 @@ export default function BasketPage() {
           <BasketItem item={item} key={item.productId} />
         ))}
       </Grid>
-      <Grid size={4}>Order Summary</Grid>
+      <Grid size={4}>
+        <OrderSummary />
+      </Grid>
     </Grid>
   );
 }
