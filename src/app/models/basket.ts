@@ -27,7 +27,7 @@ export class Item {
   }
 
 
-  productId: number | undefined
+  productId: number
   name: string
   price: number
   pictureUrl: string
