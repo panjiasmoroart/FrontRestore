@@ -1,7 +1,9 @@
 // import { useEffect, useState } from "react";
 // import type { Product } from "../../app/models/product";
+import { Grid } from "@mui/material";
 import ProductList from "./ProductList";
 import { useFetchProductsQuery } from "./catalogApi";
+import Filters from "./Filters";
 
 // type Props = {
 //   products: Product[];
@@ -20,8 +22,14 @@ export default function Catalog() {
   if (isLoading || !data) return <div>Loading...</div>;
 
   return (
-    <>
-      <ProductList products={data} />
-    </>
+    <Grid container spacing={4}>
+      <Grid size={3}>
+        <Filters />
+      </Grid>
+
+      <Grid size={9}>
+        <ProductList products={data} />
+      </Grid>
+    </Grid>
   );
 }
