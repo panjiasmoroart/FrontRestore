@@ -4,6 +4,7 @@ import { Grid } from "@mui/material";
 import ProductList from "./ProductList";
 import { useFetchProductsQuery } from "./catalogApi";
 import Filters from "./Filters";
+import { useAppSelector } from "../../app/store/store";
 
 // type Props = {
 //   products: Product[];
@@ -11,7 +12,8 @@ import Filters from "./Filters";
 
 export default function Catalog() {
   // const [products, setProducts] = useState<Product[]>([]);
-  const { data, isLoading } = useFetchProductsQuery();
+  const productParams = useAppSelector((state) => state.catalog);
+  const { data, isLoading } = useFetchProductsQuery(productParams);
 
   // useEffect(() => {
   //   fetch("https://localhost:5001/api/products")
