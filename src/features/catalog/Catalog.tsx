@@ -2,7 +2,7 @@
 // import type { Product } from "../../app/models/product";
 import { Grid, Typography } from "@mui/material";
 import ProductList from "./ProductList";
-import { useFetchProductsQuery } from "./catalogApi";
+import { useFetchFiltersQuery, useFetchProductsQuery } from "./catalogApi";
 import Filters from "./Filters";
 import { useAppDispatch, useAppSelector } from "../../app/store/store";
 import AppPagination from "../../app/shared/components/AppPagination";
@@ -16,6 +16,8 @@ export default function Catalog() {
   // const [products, setProducts] = useState<Product[]>([]);
   const productParams = useAppSelector((state) => state.catalog);
   const { data, isLoading } = useFetchProductsQuery(productParams);
+  const { data: filtersData, isLoading: filtersLoading } =
+    useFetchFiltersQuery();
   const dispatch = useAppDispatch();
 
   // useEffect(() => {
@@ -24,12 +26,13 @@ export default function Catalog() {
   //     .then((data) => setProducts(data));
   // }, []);
 
-  if (isLoading || !data) return <div>Loading...</div>;
+  if (isLoading || !data || filtersLoading || !filtersData)
+    return <div>Loading...</div>;
 
   return (
     <Grid container spacing={4}>
       <Grid size={3}>
-        <Filters />
+        <Filters filtersData={filtersData} />
       </Grid>
 
       <Grid size={9}>
