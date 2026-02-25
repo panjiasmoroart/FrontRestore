@@ -1,6 +1,6 @@
 // import { useEffect, useState } from "react";
 // import type { Product } from "../../app/models/product";
-import { Grid } from "@mui/material";
+import { Grid, Pagination } from "@mui/material";
 import ProductList from "./ProductList";
 import { useFetchProductsQuery } from "./catalogApi";
 import Filters from "./Filters";
@@ -30,7 +30,13 @@ export default function Catalog() {
       </Grid>
 
       <Grid size={9}>
-        <ProductList products={data} />
+        <ProductList products={data.items} />
+        <Pagination
+          color="secondary"
+          size="large"
+          count={data.pagination?.totalPages}
+          page={data.pagination?.currentPage}
+        />
       </Grid>
     </Grid>
   );
