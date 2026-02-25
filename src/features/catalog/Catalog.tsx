@@ -1,10 +1,12 @@
 // import { useEffect, useState } from "react";
 // import type { Product } from "../../app/models/product";
-import { Grid, Pagination } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import ProductList from "./ProductList";
 import { useFetchProductsQuery } from "./catalogApi";
 import Filters from "./Filters";
-import { useAppSelector } from "../../app/store/store";
+import { useAppDispatch, useAppSelector } from "../../app/store/store";
+import AppPagination from "../../app/shared/components/AppPagination";
+import { setPageNumber } from "./catalogSlice";
 
 // type Props = {
 //   products: Product[];
@@ -14,6 +16,7 @@ export default function Catalog() {
   // const [products, setProducts] = useState<Product[]>([]);
   const productParams = useAppSelector((state) => state.catalog);
   const { data, isLoading } = useFetchProductsQuery(productParams);
+  const dispatch = useAppDispatch();
 
   // useEffect(() => {
   //   fetch("https://localhost:5001/api/products")
@@ -30,13 +33,22 @@ export default function Catalog() {
       </Grid>
 
       <Grid size={9}>
-        <ProductList products={data.items} />
-        <Pagination
-          color="secondary"
-          size="large"
-          count={data.pagination?.totalPages}
-          page={data.pagination?.currentPage}
-        />
+        {data.items && data.items.length > 0 ? (
+          <>
+            <ProductList products={data.items} />
+            <AppPagination
+              metadata={data.pagination}
+              onPageChange={(page: number) => {
+                dispatch(setPageNumber(page));
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            />
+          </>
+        ) : (
+          <Typography variant="h5">
+            There are no results for this filter
+          </Typography>
+        )}
       </Grid>
     </Grid>
   );
