@@ -9,17 +9,25 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import type { LoginSchema } from "../../lib/schemas/loginSchema";
+import { loginSchema, type LoginSchema } from "../../lib/schemas/loginSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useLoginMutation } from "./accountApi";
 
 export default function LoginForm() {
+  const [login, { isLoading }] = useLoginMutation();
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginSchema>();
+  } = useForm<LoginSchema>({
+    mode: "onTouched",
+    resolver: zodResolver(loginSchema),
+  });
+  // const navigate = useNavigate();
+  // const location = useLocation();
 
   const onSubmit = async (data: LoginSchema) => {
-    console.log(data);
+    await login(data);
   };
 
   return (
@@ -45,7 +53,7 @@ export default function LoginForm() {
             fullWidth
             label="Email"
             autoFocus
-            {...register("email", { required: "Email is required" })}
+            {...register("email")}
             error={!!errors.email}
             helperText={errors.email?.message}
           />
@@ -53,11 +61,11 @@ export default function LoginForm() {
             fullWidth
             label="Password"
             type="password"
-            {...register("password", { required: "Password is required" })}
+            {...register("password")}
             error={!!errors.password}
             helperText={errors.password?.message}
           />
-          <Button variant="contained" type="submit">
+          <Button variant="contained" type="submit" disabled={isLoading}>
             Sign in
           </Button>
           <Typography sx={{ textAlign: "center" }}>
