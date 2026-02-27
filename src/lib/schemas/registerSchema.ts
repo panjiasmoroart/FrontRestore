@@ -9,6 +9,7 @@ export const registerSchema = z.object({
   password: z.string().regex(passwordValidation, {
     message: 'Password must contain 1 lowercase character, 1 uppercase character, 1 number, 1 special and be 6-10 characters'
   })
+  // password: z.string()
 });
 
 export type RegisterSchema = z.infer<typeof registerSchema>;

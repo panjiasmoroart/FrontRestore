@@ -21,7 +21,7 @@ export default function RegisterForm() {
   const {
     register,
     handleSubmit,
-    // setError,
+    setError,
     formState: { errors, isValid, isLoading },
   } = useForm<RegisterSchema>({
     mode: "onTouched",
@@ -30,10 +30,21 @@ export default function RegisterForm() {
 
   const onSubmit = async (data: RegisterSchema) => {
     try {
-      await registerUser(data);
+      await registerUser(data).unwrap();
     } catch (error) {
       const apiError = error as { message: string };
-      console.log(apiError);
+
+      if (apiError.message && typeof apiError.message === "string") {
+        const errorArray = apiError.message.split(",");
+
+        errorArray.forEach((e) => {
+          if (e.includes("Password")) {
+            setError("password", { message: e });
+          } else if (e.includes("Email")) {
+            setError("email", { message: e });
+          }
+        });
+      }
     }
   };
 
