@@ -7,14 +7,15 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { loginSchema, type LoginSchema } from "../../lib/schemas/loginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLoginMutation } from "./accountApi";
+import { useLazyUserInfoQuery, useLoginMutation } from "./accountApi";
 
 export default function LoginForm() {
   const [login, { isLoading }] = useLoginMutation();
+  const [fetchUserInfo] = useLazyUserInfoQuery();
   const {
     register,
     handleSubmit,
@@ -24,11 +25,12 @@ export default function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
   const navigate = useNavigate();
-  // const location = useLocation();
+  const location = useLocation();
 
   const onSubmit = async (data: LoginSchema) => {
     await login(data);
-    navigate("/catalog");
+    await fetchUserInfo();
+    navigate(location.state?.from || "/catalog");
   };
 
   return (
