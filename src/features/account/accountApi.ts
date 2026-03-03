@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithErrorHandling } from "../../app/api/baseApi";
-import type { User } from "../../app/models/user";
+import type { Address, User } from "../../app/models/user";
 import { router } from "../../app/routes/Routes";
 import { toast } from "react-toastify";
 
@@ -62,6 +62,11 @@ export const accountApi = createApi({
         router.navigate('/');
       }
     }),
+    fetchAddress: builder.query<Address, void>({
+      query: () => ({
+        url: 'account/address'
+      })
+    }),
   })
 })
 
@@ -70,5 +75,6 @@ export const {
   useRegisterMutation,
   useLogoutMutation,
   useUserInfoQuery,
-  useLazyUserInfoQuery
+  useLazyUserInfoQuery,
+  useFetchAddressQuery
 } = accountApi;

@@ -1,10 +1,29 @@
-import { Box, Button, Paper, Step, StepLabel, Stepper } from "@mui/material";
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Paper,
+  Step,
+  StepLabel,
+  Stepper,
+  Typography,
+} from "@mui/material";
+import { AddressElement } from "@stripe/react-stripe-js";
+import type { StripeAddressElementChangeEvent } from "@stripe/stripe-js";
 import { useState } from "react";
+import { useFetchAddressQuery } from "../account/accountApi";
 
 const steps = ["Address", "Payment", "Review"];
 
 export default function CheckoutStepper() {
   const [activeStep, setActiveStep] = useState(0);
+  const { data, isLoading } = useFetchAddressQuery();
+
+  let name, restAddress;
+  if (data) {
+    ({ name, ...restAddress } = data);
+  }
 
   const handleNext = () => {
     setActiveStep((step) => step + 1);
@@ -13,6 +32,13 @@ export default function CheckoutStepper() {
   const handleBack = () => {
     setActiveStep((step) => step - 1);
   };
+
+  const handleAddressChange = (event: StripeAddressElementChangeEvent) => {
+    console.log(event);
+  };
+
+  if (isLoading)
+    return <Typography variant="h6">Loading checkout...</Typography>;
 
   return (
     <Paper sx={{ p: 3, borderRadius: 3 }}>
@@ -29,6 +55,24 @@ export default function CheckoutStepper() {
       <Box sx={{ mt: 2 }}>
         <Box sx={{ display: activeStep === 0 ? "block" : "none" }}>
           Address step
+          <AddressElement
+            // options={{
+            //   mode: "shipping",
+            // }}
+            options={{
+              mode: "shipping",
+              defaultValues: {
+                name: name,
+                address: restAddress,
+              },
+            }}
+            onChange={handleAddressChange}
+          />
+          <FormControlLabel
+            sx={{ display: "flex", justifyContent: "end" }}
+            control={<Checkbox />}
+            label="Save as default address"
+          />
         </Box>
 
         <Box sx={{ display: activeStep === 1 ? "block" : "none" }}>
