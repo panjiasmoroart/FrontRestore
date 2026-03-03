@@ -22,6 +22,7 @@ export default defineConfig([
     rules: {
       // nonaktif Calling setState synchronously within an effect can trigger cascading renders
       "react-hooks/set-state-in-effect": "off",
+      "react-hooks/preserve-manual-memoization": "off",
     },
   },
 ]);
