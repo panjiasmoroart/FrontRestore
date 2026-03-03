@@ -9,7 +9,7 @@ import {
   Stepper,
   Typography,
 } from "@mui/material";
-import { AddressElement } from "@stripe/react-stripe-js";
+import { AddressElement, PaymentElement } from "@stripe/react-stripe-js";
 import type { StripeAddressElementChangeEvent } from "@stripe/stripe-js";
 import { useState } from "react";
 import { useFetchAddressQuery } from "../account/accountApi";
@@ -76,7 +76,7 @@ export default function CheckoutStepper() {
         </Box>
 
         <Box sx={{ display: activeStep === 1 ? "block" : "none" }}>
-          Payment step
+          <PaymentElement />
         </Box>
 
         <Box sx={{ display: activeStep === 2 ? "block" : "none" }}>
