@@ -13,6 +13,7 @@ import { AddressElement, PaymentElement } from "@stripe/react-stripe-js";
 import type { StripeAddressElementChangeEvent } from "@stripe/stripe-js";
 import { useState } from "react";
 import { useFetchAddressQuery } from "../account/accountApi";
+import Review from "./Review";
 
 const steps = ["Address", "Payment", "Review"];
 
@@ -80,7 +81,7 @@ export default function CheckoutStepper() {
         </Box>
 
         <Box sx={{ display: activeStep === 2 ? "block" : "none" }}>
-          Review step
+          <Review />
         </Box>
       </Box>
 
