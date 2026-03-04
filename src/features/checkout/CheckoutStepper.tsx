@@ -9,10 +9,17 @@ import {
   Stepper,
   Typography,
 } from "@mui/material";
-import { AddressElement, PaymentElement } from "@stripe/react-stripe-js";
+import {
+  AddressElement,
+  PaymentElement,
+  useElements,
+} from "@stripe/react-stripe-js";
 import type { StripeAddressElementChangeEvent } from "@stripe/stripe-js";
 import { useState } from "react";
-import { useFetchAddressQuery } from "../account/accountApi";
+import {
+  useFetchAddressQuery,
+  useUpdateUserAddressMutation,
+} from "../account/accountApi";
 import Review from "./Review";
 import type { Address } from "../../app/models/user";
 
@@ -20,21 +27,40 @@ const steps = ["Address", "Payment", "Review"];
 
 export default function CheckoutStepper() {
   const [activeStep, setActiveStep] = useState(0);
-  // const { data, isLoading } = useFetchAddressQuery();
   const { data: { name, ...restAddress } = {} as Address, isLoading } =
     useFetchAddressQuery();
+  // const { data, isLoading } = useFetchAddressQuery();
+  const [updateAddress] = useUpdateUserAddressMutation();
+  const [saveAddressChecked, setSaveAddressChecked] = useState(false);
+  const elements = useElements();
 
   // let name, restAddress;
   // if (data) {
   //   ({ name, ...restAddress } = data);
   // }
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (activeStep === 0 && saveAddressChecked && elements) {
+      const address = await getStripeAddress();
+      if (address) await updateAddress(address);
+    }
     setActiveStep((step) => step + 1);
   };
 
   const handleBack = () => {
     setActiveStep((step) => step - 1);
+  };
+
+  const getStripeAddress = async () => {
+    const addressElement = elements?.getElement("address");
+    if (!addressElement) return null;
+    const {
+      value: { name, address },
+    } = await addressElement.getValue();
+
+    if (name && address) return { ...address, name };
+
+    return null;
   };
 
   const handleAddressChange = (event: StripeAddressElementChangeEvent) => {
@@ -74,7 +100,12 @@ export default function CheckoutStepper() {
           />
           <FormControlLabel
             sx={{ display: "flex", justifyContent: "end" }}
-            control={<Checkbox />}
+            control={
+              <Checkbox
+                checked={saveAddressChecked}
+                onChange={(e) => setSaveAddressChecked(e.target.checked)}
+              />
+            }
             label="Save as default address"
           />
         </Box>
