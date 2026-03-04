@@ -31,6 +31,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import { useBasket } from "../../lib/hooks/useBasket";
 import { currencyFormat } from "../../lib/util";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const steps = ["Address", "Payment", "Review"];
 
@@ -38,6 +39,7 @@ export default function CheckoutStepper() {
   const [activeStep, setActiveStep] = useState(0);
   const { data: { name, ...restAddress } = {} as Address, isLoading } =
     useFetchAddressQuery();
+  const { basket } = useBasket();
   // const { data, isLoading } = useFetchAddressQuery();
   const [updateAddress] = useUpdateUserAddressMutation();
   const [saveAddressChecked, setSaveAddressChecked] = useState(false);
@@ -49,6 +51,7 @@ export default function CheckoutStepper() {
   const { total } = useBasket();
   const [confirmationToken, setConfirmationToken] =
     useState<ConfirmationToken | null>(null);
+  const navigate = useNavigate();
 
   // let name, restAddress;
   // if (data) {
@@ -69,11 +72,46 @@ export default function CheckoutStepper() {
       if (stripeResult.error) return toast.error(stripeResult.error.message);
       setConfirmationToken(stripeResult.confirmationToken);
     }
+    if (activeStep === 2) {
+      await confirmPayment();
+    }
     setActiveStep((step) => step + 1);
   };
 
   const handleBack = () => {
     setActiveStep((step) => step - 1);
+  };
+
+  const confirmPayment = async () => {
+    setSubmitting(true);
+
+    try {
+      if (!confirmationToken || !basket?.clientSecret)
+        throw new Error("Unable to process payment");
+
+      const paymentResult = await stripe?.confirmPayment({
+        clientSecret: basket.clientSecret,
+        redirect: "if_required",
+        confirmParams: {
+          confirmation_token: confirmationToken.id,
+        },
+      });
+
+      if (paymentResult?.paymentIntent?.status === "succeeded") {
+        navigate("/checkout/success");
+      } else if (paymentResult?.error) {
+        throw new Error(paymentResult.error.message);
+      } else {
+        throw new Error("Something went wrong");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+      setActiveStep((step) => step - 1);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const getStripeAddress = async () => {
