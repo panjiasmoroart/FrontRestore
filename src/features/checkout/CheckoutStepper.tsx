@@ -14,17 +14,20 @@ import type { StripeAddressElementChangeEvent } from "@stripe/stripe-js";
 import { useState } from "react";
 import { useFetchAddressQuery } from "../account/accountApi";
 import Review from "./Review";
+import type { Address } from "../../app/models/user";
 
 const steps = ["Address", "Payment", "Review"];
 
 export default function CheckoutStepper() {
   const [activeStep, setActiveStep] = useState(0);
-  const { data, isLoading } = useFetchAddressQuery();
+  // const { data, isLoading } = useFetchAddressQuery();
+  const { data: { name, ...restAddress } = {} as Address, isLoading } =
+    useFetchAddressQuery();
 
-  let name, restAddress;
-  if (data) {
-    ({ name, ...restAddress } = data);
-  }
+  // let name, restAddress;
+  // if (data) {
+  //   ({ name, ...restAddress } = data);
+  // }
 
   const handleNext = () => {
     setActiveStep((step) => step + 1);
