@@ -14,7 +14,10 @@ import {
   PaymentElement,
   useElements,
 } from "@stripe/react-stripe-js";
-import type { StripeAddressElementChangeEvent } from "@stripe/stripe-js";
+import type {
+  StripeAddressElementChangeEvent,
+  StripePaymentElementChangeEvent,
+} from "@stripe/stripe-js";
 import { useState } from "react";
 import {
   useFetchAddressQuery,
@@ -22,6 +25,9 @@ import {
 } from "../account/accountApi";
 import Review from "./Review";
 import type { Address } from "../../app/models/user";
+import LoadingButton from "@mui/lab/LoadingButton";
+import { useBasket } from "../../lib/hooks/useBasket";
+import { currencyFormat } from "../../lib/util";
 
 const steps = ["Address", "Payment", "Review"];
 
@@ -33,6 +39,10 @@ export default function CheckoutStepper() {
   const [updateAddress] = useUpdateUserAddressMutation();
   const [saveAddressChecked, setSaveAddressChecked] = useState(false);
   const elements = useElements();
+  const [addressComplete, setAddressComplete] = useState(false);
+  const [paymentComplete, setPaymentComplete] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const { total } = useBasket();
 
   // let name, restAddress;
   // if (data) {
@@ -64,7 +74,11 @@ export default function CheckoutStepper() {
   };
 
   const handleAddressChange = (event: StripeAddressElementChangeEvent) => {
-    console.log(event);
+    setAddressComplete(event.complete);
+  };
+
+  const handlePaymentChange = (event: StripePaymentElementChangeEvent) => {
+    setPaymentComplete(event.complete);
   };
 
   if (isLoading)
@@ -111,7 +125,7 @@ export default function CheckoutStepper() {
         </Box>
 
         <Box sx={{ display: activeStep === 1 ? "block" : "none" }}>
-          <PaymentElement />
+          <PaymentElement onChange={handlePaymentChange} />
         </Box>
 
         <Box sx={{ display: activeStep === 2 ? "block" : "none" }}>
@@ -121,7 +135,19 @@ export default function CheckoutStepper() {
 
       <Box display="flex" paddingTop={2} justifyContent="space-between">
         <Button onClick={handleBack}>Back</Button>
-        <Button onClick={handleNext}>Next</Button>
+        <LoadingButton
+          onClick={handleNext}
+          disabled={
+            (activeStep === 0 && !addressComplete) ||
+            (activeStep === 1 && !paymentComplete) ||
+            submitting
+          }
+          loading={submitting}
+        >
+          {activeStep === steps.length - 1
+            ? `Pay ${currencyFormat(total)}`
+            : "Next"}
+        </LoadingButton>
       </Box>
     </Paper>
   );
