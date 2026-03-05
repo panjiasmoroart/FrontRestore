@@ -39,7 +39,6 @@ export default function CheckoutStepper() {
   const [activeStep, setActiveStep] = useState(0);
   const { data: { name, ...restAddress } = {} as Address, isLoading } =
     useFetchAddressQuery();
-  const { basket } = useBasket();
   // const { data, isLoading } = useFetchAddressQuery();
   const [updateAddress] = useUpdateUserAddressMutation();
   const [saveAddressChecked, setSaveAddressChecked] = useState(false);
@@ -48,7 +47,7 @@ export default function CheckoutStepper() {
   const [addressComplete, setAddressComplete] = useState(false);
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const { total } = useBasket();
+  const { basket, total, clearBasket } = useBasket();
   const [confirmationToken, setConfirmationToken] =
     useState<ConfirmationToken | null>(null);
   const navigate = useNavigate();
@@ -99,6 +98,7 @@ export default function CheckoutStepper() {
 
       if (paymentResult?.paymentIntent?.status === "succeeded") {
         navigate("/checkout/success");
+        clearBasket();
       } else if (paymentResult?.error) {
         throw new Error(paymentResult.error.message);
       } else {
