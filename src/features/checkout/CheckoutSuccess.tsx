@@ -16,7 +16,7 @@ import { currencyFormat } from "../../lib/util";
 
 export default function CheckoutSuccess() {
   const { state } = useLocation();
-  const order = state.data as Order;
+  const order = state?.data as Order;
 
   if (!order) return <Typography>Problem accessing the order</Typography>;
 
