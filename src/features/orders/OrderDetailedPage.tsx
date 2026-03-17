@@ -13,7 +13,11 @@ import {
   Typography,
 } from "@mui/material";
 import { format } from "date-fns";
-import { currencyFormat } from "../../lib/util";
+import {
+  currencyFormat,
+  formatAddressString,
+  formatPaymentString,
+} from "../../lib/util";
 
 export default function OrderDetailedPage() {
   const { id } = useParams();
@@ -54,7 +58,7 @@ export default function OrderDetailedPage() {
             Shipping address
           </Typography>
           <Typography component="dd" variant="body2" fontWeight="300">
-            order shippingAddress
+            {formatAddressString(order.shippingAddress)}
           </Typography>
         </Box>
         <Box component="dl">
@@ -62,7 +66,7 @@ export default function OrderDetailedPage() {
             Payment info
           </Typography>
           <Typography component="dd" variant="body2" fontWeight="300">
-            order paymentSummary
+            {formatPaymentString(order.paymentSummary)}
           </Typography>
         </Box>
       </Box>

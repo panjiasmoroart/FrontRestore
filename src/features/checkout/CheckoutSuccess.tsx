@@ -9,10 +9,14 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import type {
   Order,
-  PaymentSummary,
-  ShippingAddress,
+  // PaymentSummary,
+  // ShippingAddress,
 } from "../../app/models/order";
-import { currencyFormat } from "../../lib/util";
+import {
+  currencyFormat,
+  formatAddressString,
+  formatPaymentString,
+} from "../../lib/util";
 
 export default function CheckoutSuccess() {
   const { state } = useLocation();
@@ -20,15 +24,15 @@ export default function CheckoutSuccess() {
 
   if (!order) return <Typography>Problem accessing the order</Typography>;
 
-  const formatAddressString = (address: ShippingAddress) => {
-    return `${address?.name}, ${address?.line1}, ${address?.city}, ${address?.state}, 
-            ${address?.postal_code}, ${address?.country}`;
-  };
+  // const formatAddressString = (address: ShippingAddress) => {
+  //   return `${address?.name}, ${address?.line1}, ${address?.city}, ${address?.state},
+  //           ${address?.postal_code}, ${address?.country}`;
+  // };
 
-  const formatPaymentString = (card: PaymentSummary) => {
-    return `${card?.brand?.toUpperCase()}, **** **** **** ${card?.last4}, 
-            Exp: ${card?.exp_month}/${card?.exp_year}`;
-  };
+  // const formatPaymentString = (card: PaymentSummary) => {
+  //   return `${card?.brand?.toUpperCase()}, **** **** **** ${card?.last4},
+  //           Exp: ${card?.exp_month}/${card?.exp_year}`;
+  // };
 
   return (
     <Container maxWidth="md">
