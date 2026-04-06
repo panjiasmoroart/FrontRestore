@@ -10,21 +10,34 @@ import AppTextInput from "../../app/shared/components/AppTextInput";
 import { useFetchFiltersQuery } from "../catalog/catalogApi";
 import AppSelectInput from "../../app/shared/components/AppSelectInput";
 import AppDropzone from "../../app/shared/components/AppDropzone";
+import type { Product } from "../../app/models/product";
+import { useEffect } from "react";
 
-interface ProductFormProps {
-  product?: {
-    pictureUrl?: string;
-  };
-}
+// interface ProductFormProps {
+//   product?: {
+//     pictureUrl?: string;
+//   };
+// }
 
-export default function ProductForm({ product }: ProductFormProps) {
-  const { control, handleSubmit, watch } = useForm({
+type Props = {
+  setEditMode: (value: boolean) => void;
+  product: Product | null;
+  // refetch: () => void;
+  // setSelectedProduct: (value: Product | null) => void;
+};
+
+export default function ProductForm({ setEditMode, product }: Props) {
+  const { control, handleSubmit, watch, reset } = useForm({
     mode: "onTouched",
     resolver: zodResolver(createProductSchema),
   });
 
   const watchFile = watch("file") as (File & { preview?: string }) | undefined;
   const { data } = useFetchFiltersQuery();
+
+  useEffect(() => {
+    if (product) reset(product);
+  }, [product, reset]);
 
   const onSubmit = async (data: CreateProductSchema) => {
     console.log(data);
@@ -110,7 +123,7 @@ export default function ProductForm({ product }: ProductFormProps) {
         </Grid>
         <Box display="flex" justifyContent="space-between" sx={{ mt: 3 }}>
           <Button
-            // onClick={() => setEditMode(false)}
+            onClick={() => setEditMode(false)}
             variant="contained"
             color="inherit"
           >

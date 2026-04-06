@@ -25,12 +25,16 @@ export default function InventoryPage() {
   const { data } = useFetchProductsQuery(productParams);
   const dispatch = useAppDispatch();
   const [editMode, setEditMode] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const handleSelectProduct = (product: Product) => {
     console.log("Handle product : ", product);
+    setSelectedProduct(product);
+    setEditMode(true);
   };
 
-  if (editMode) return <ProductForm />;
+  if (editMode)
+    return <ProductForm setEditMode={setEditMode} product={selectedProduct} />;
 
   return (
     <>
