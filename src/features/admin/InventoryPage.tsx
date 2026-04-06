@@ -39,6 +39,7 @@ export default function InventoryPage() {
         setEditMode={setEditMode}
         product={selectedProduct}
         refetch={refetch}
+        setSelectedProduct={setSelectedProduct}
       />
     );
 

@@ -11,34 +11,37 @@ import { useFetchFiltersQuery } from "../catalog/catalogApi";
 import AppSelectInput from "../../app/shared/components/AppSelectInput";
 import AppDropzone from "../../app/shared/components/AppDropzone";
 import type { Product } from "../../app/models/product";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCreateProductMutation, useUpdateProductMutation } from "./adminApi";
-
-// interface ProductFormProps {
-//   product?: {
-//     pictureUrl?: string;
-//   };
-// }
+import { handleApiError } from "../../lib/util";
 
 type Props = {
   setEditMode: (value: boolean) => void;
   product: Product | null;
   refetch: () => void;
-  // setSelectedProduct: (value: Product | null) => void;
+  setSelectedProduct: (value: Product | null) => void;
 };
 
-export default function ProductForm({ setEditMode, product, refetch }: Props) {
+export default function ProductForm({
+  setEditMode,
+  product,
+  refetch,
+  setSelectedProduct,
+}: Props) {
   const {
     control,
     handleSubmit,
     watch,
     reset,
+    setError,
     formState: { isSubmitting },
   } = useForm({
     mode: "onTouched",
     resolver: zodResolver(createProductSchema),
   });
 
+  const [preview, setPreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const watchFile = watch("file") as (File & { preview?: string }) | undefined;
   const { data } = useFetchFiltersQuery();
   const [createProduct] = useCreateProductMutation();
@@ -52,10 +55,31 @@ export default function ProductForm({ setEditMode, product, refetch }: Props) {
     };
   }, [product, reset, watchFile]);
 
-  const createFormData = (items: FieldValues) => {
+  // const createFormData = (items: FieldValues) => {
+  //   const formData = new FormData();
+  //   for (const key in items) {
+  //     formData.append(key, items[key]);
+  //   }
+
+  //   return formData;
+  // };
+
+  const createFormData = (data: FieldValues, product?: Product | null) => {
     const formData = new FormData();
-    for (const key in items) {
-      formData.append(key, items[key]);
+
+    if (product) {
+      formData.append("id", product.id.toString());
+    }
+
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("price", data.price.toString());
+    formData.append("type", data.type);
+    formData.append("brand", data.brand);
+    formData.append("quantityInStock", data.quantityInStock.toString());
+
+    if (selectedFile) {
+      formData.append("file", selectedFile);
     }
 
     return formData;
@@ -63,14 +87,30 @@ export default function ProductForm({ setEditMode, product, refetch }: Props) {
 
   const onSubmit = async (data: CreateProductSchema) => {
     try {
-      const formData = createFormData(data);
-      if (product)
+      // const formData = createFormData(data);
+      const formData = createFormData(data, product);
+
+      if (product) {
         await updateProduct({ id: product.id, data: formData }).unwrap();
-      else await createProduct(formData).unwrap();
+      } else {
+        await createProduct(formData).unwrap();
+      }
+
       refetch();
       setEditMode(false);
+      setSelectedProduct(null);
     } catch (error) {
       console.log("Error submitting form : ", error);
+      handleApiError<CreateProductSchema>(error, setError, [
+        "brand",
+        "description",
+        "file",
+        "name",
+        "pictureUrl",
+        "price",
+        "quantityInStock",
+        "type",
+      ]);
     }
   };
 
@@ -136,8 +176,15 @@ export default function ProductForm({ setEditMode, product, refetch }: Props) {
             justifyContent="space-between"
             alignItems="center"
           >
-            <AppDropzone name="file" control={control} />
-            {watchFile?.preview ? (
+            <AppDropzone
+              name="file"
+              control={control}
+              onFileSelected={(file, preview) => {
+                setSelectedFile(file);
+                setPreview(preview);
+              }}
+            />
+            {/* {watchFile?.preview ? (
               <img
                 src={watchFile.preview}
                 alt="preview of image"
@@ -146,6 +193,19 @@ export default function ProductForm({ setEditMode, product, refetch }: Props) {
             ) : product?.pictureUrl ? (
               <img
                 src={product?.pictureUrl}
+                alt="preview of image"
+                style={{ maxHeight: 200 }}
+              />
+            ) : null} */}
+            {preview ? (
+              <img
+                src={preview}
+                alt="preview of image"
+                style={{ maxHeight: 200 }}
+              />
+            ) : product?.pictureUrl ? (
+              <img
+                src={product.pictureUrl}
                 alt="preview of image"
                 style={{ maxHeight: 200 }}
               />

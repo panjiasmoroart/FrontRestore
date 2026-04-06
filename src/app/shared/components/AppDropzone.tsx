@@ -10,22 +10,36 @@ import {
 
 type Props<T extends FieldValues> = {
   name: keyof T;
+  onFileSelected?: (file: File, preview: string) => void;
 } & UseControllerProps<T>;
 
 export default function AppDropzone<T extends FieldValues>(props: Props<T>) {
   const { fieldState, field } = useController({ ...props });
 
+  // const onDrop = useCallback(
+  //   (acceptedFiles: File[]) => {
+  //     if (acceptedFiles.length > 0) {
+  //       const fileWithPreview = Object.assign(acceptedFiles[0], {
+  //         preview: URL.createObjectURL(acceptedFiles[0]),
+  //       });
+
+  //       field.onChange(fileWithPreview);
+  //     }
+  //   },
+  //   [field],
+  // );
+
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {
-        const fileWithPreview = Object.assign(acceptedFiles[0], {
-          preview: URL.createObjectURL(acceptedFiles[0]),
-        });
+        const file = acceptedFiles[0];
+        const preview = URL.createObjectURL(file);
 
-        field.onChange(fileWithPreview);
+        field.onChange(file); // ✅ kirim file asli
+        props.onFileSelected?.(file, preview); // 🔥 kirim preview ke parent
       }
     },
-    [field],
+    [field, props],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });

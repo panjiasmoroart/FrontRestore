@@ -17,7 +17,7 @@ export const adminApi = createApi({
     }),
     updateProduct: builder.mutation<void, { id: number, data: FormData }>({
       query: ({ id, data }) => {
-        data.append('id', id.toString())
+        // data.append('id', id.toString())
 
         return {
           url: 'products',
