@@ -19,6 +19,7 @@ import { currencyFormat } from "../../lib/util";
 import type { Product } from "../../app/models/product";
 import ProductForm from "./ProductForm";
 import { useState } from "react";
+import { useDeleteProductMutation } from "./adminApi";
 
 export default function InventoryPage() {
   const productParams = useAppSelector((state) => state.catalog);
@@ -26,11 +27,21 @@ export default function InventoryPage() {
   const dispatch = useAppDispatch();
   const [editMode, setEditMode] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [deleteProduct] = useDeleteProductMutation();
 
   const handleSelectProduct = (product: Product) => {
     console.log("Handle product : ", product);
     setSelectedProduct(product);
     setEditMode(true);
+  };
+
+  const handleDeleteProduct = async (id: number) => {
+    try {
+      await deleteProduct(id);
+      refetch();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   if (editMode)
@@ -107,7 +118,7 @@ export default function InventoryPage() {
                       startIcon={<Edit />}
                     />
                     <Button
-                      // onClick={() => handleDeleteProduct(product.id)}
+                      onClick={() => handleDeleteProduct(product.id)}
                       startIcon={<Delete />}
                       color="error"
                     />
