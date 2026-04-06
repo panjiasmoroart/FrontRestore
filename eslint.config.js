@@ -23,6 +23,7 @@ export default defineConfig([
       // nonaktif Calling setState synchronously within an effect can trigger cascading renders
       "react-hooks/set-state-in-effect": "off",
       "react-hooks/preserve-manual-memoization": "off",
+      "@typescript-eslint/no-unused-vars": "off",
     },
   },
 ]);

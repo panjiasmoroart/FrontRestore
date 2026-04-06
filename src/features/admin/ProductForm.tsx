@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, type FieldValues } from "react-hook-form";
 import {
   createProductSchema,
   type CreateProductSchema,
@@ -12,6 +12,7 @@ import AppSelectInput from "../../app/shared/components/AppSelectInput";
 import AppDropzone from "../../app/shared/components/AppDropzone";
 import type { Product } from "../../app/models/product";
 import { useEffect } from "react";
+import { useCreateProductMutation, useUpdateProductMutation } from "./adminApi";
 
 // interface ProductFormProps {
 //   product?: {
@@ -22,25 +23,55 @@ import { useEffect } from "react";
 type Props = {
   setEditMode: (value: boolean) => void;
   product: Product | null;
-  // refetch: () => void;
+  refetch: () => void;
   // setSelectedProduct: (value: Product | null) => void;
 };
 
-export default function ProductForm({ setEditMode, product }: Props) {
-  const { control, handleSubmit, watch, reset } = useForm({
+export default function ProductForm({ setEditMode, product, refetch }: Props) {
+  const {
+    control,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { isSubmitting },
+  } = useForm({
     mode: "onTouched",
     resolver: zodResolver(createProductSchema),
   });
 
   const watchFile = watch("file") as (File & { preview?: string }) | undefined;
   const { data } = useFetchFiltersQuery();
+  const [createProduct] = useCreateProductMutation();
+  const [updateProduct] = useUpdateProductMutation();
 
   useEffect(() => {
     if (product) reset(product);
-  }, [product, reset]);
+
+    return () => {
+      if (watchFile?.preview) URL.revokeObjectURL(watchFile.preview);
+    };
+  }, [product, reset, watchFile]);
+
+  const createFormData = (items: FieldValues) => {
+    const formData = new FormData();
+    for (const key in items) {
+      formData.append(key, items[key]);
+    }
+
+    return formData;
+  };
 
   const onSubmit = async (data: CreateProductSchema) => {
-    console.log(data);
+    try {
+      const formData = createFormData(data);
+      if (product)
+        await updateProduct({ id: product.id, data: formData }).unwrap();
+      else await createProduct(formData).unwrap();
+      refetch();
+      setEditMode(false);
+    } catch (error) {
+      console.log("Error submitting form : ", error);
+    }
   };
 
   return (
@@ -130,7 +161,7 @@ export default function ProductForm({ setEditMode, product }: Props) {
             Cancel
           </Button>
           <LoadingButton
-            // loading={isSubmitting}
+            loading={isSubmitting}
             variant="contained"
             color="success"
             type="submit"
