@@ -1,17 +1,22 @@
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   createProductSchema,
   type CreateProductSchema,
 } from "../../lib/schemas/createProductSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, Grid, Paper, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, Paper, Typography } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
+import AppTextInput from "../../app/shared/components/AppTextInput";
+import { useFetchFiltersQuery } from "../catalog/catalogApi";
+import AppSelectInput from "../../app/shared/components/AppSelectInput";
 
 export default function ProductForm() {
   const { control, handleSubmit } = useForm({
     mode: "onTouched",
-    // resolver: zodResolver(createProductSchema),
+    resolver: zodResolver(createProductSchema),
   });
+
+  const { data } = useFetchFiltersQuery();
 
   const onSubmit = async (data: CreateProductSchema) => {
     console.log(data);
@@ -26,16 +31,18 @@ export default function ProductForm() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={3}>
           <Grid size={12}>
-            <Controller
-              render={({ field }) => (
-                <TextField {...field} fullWidth label="name" />
-              )}
-              name="name"
-              control={control}
-              defaultValue=""
-            />
+            <AppTextInput control={control} name="name" label="Product name" />
           </Grid>
-          <Grid size={6}></Grid>
+          <Grid size={6}>
+            {data?.brands && (
+              <AppSelectInput
+                items={data.brands}
+                control={control}
+                name="brand"
+                label="Brand"
+              />
+            )}
+          </Grid>
           <Grid size={6}></Grid>
           <Grid size={6}></Grid>
           <Grid size={6}></Grid>
