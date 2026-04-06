@@ -9,13 +9,21 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import AppTextInput from "../../app/shared/components/AppTextInput";
 import { useFetchFiltersQuery } from "../catalog/catalogApi";
 import AppSelectInput from "../../app/shared/components/AppSelectInput";
+import AppDropzone from "../../app/shared/components/AppDropzone";
 
-export default function ProductForm() {
-  const { control, handleSubmit } = useForm({
+interface ProductFormProps {
+  product?: {
+    pictureUrl?: string;
+  };
+}
+
+export default function ProductForm({ product }: ProductFormProps) {
+  const { control, handleSubmit, watch } = useForm({
     mode: "onTouched",
     resolver: zodResolver(createProductSchema),
   });
 
+  const watchFile = watch("file") as (File & { preview?: string }) | undefined;
   const { data } = useFetchFiltersQuery();
 
   const onSubmit = async (data: CreateProductSchema) => {
@@ -78,8 +86,26 @@ export default function ProductForm() {
               label="Description"
             />
           </Grid>
-          <Grid size={12}>
-            <AppTextInput control={control} name="file" label="image" />
+          <Grid
+            size={12}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <AppDropzone name="file" control={control} />
+            {watchFile?.preview ? (
+              <img
+                src={watchFile.preview}
+                alt="preview of image"
+                style={{ maxHeight: 200 }}
+              />
+            ) : product?.pictureUrl ? (
+              <img
+                src={product?.pictureUrl}
+                alt="preview of image"
+                style={{ maxHeight: 200 }}
+              />
+            ) : null}
           </Grid>
         </Grid>
         <Box display="flex" justifyContent="space-between" sx={{ mt: 3 }}>
